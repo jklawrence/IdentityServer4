@@ -28,17 +28,17 @@ namespace IdentityServer4.Hosting
         {
             var request = context.Request;
 
-            var origin = _options.PublicOrigin ?? request.Scheme + "://" + request.Host.Value;
-            context.SetIdentityServerOrigin(origin);
-            context.SetIdentityServerBasePath(request.PathBase.Value.RemoveTrailingSlash());
-
             if (_options.PublicOrigin.IsPresent())
             {
                 var split = _options.PublicOrigin.Split(new[] { "://" }, StringSplitOptions.RemoveEmptyEntries);
 
-                context.Request.Scheme = split.First();
-                context.Request.Host = new HostString(split.Skip(1).First());
+                request.Scheme = split.First();
+                request.Host = new HostString(split.Skip(1).First());
             }
+
+            var origin = request.Scheme + "://" + request.Host.Value;
+            context.SetIdentityServerOrigin(origin);
+            context.SetIdentityServerBasePath(request.PathBase.Value.RemoveTrailingSlash());
 
             await _next(context);
         }
